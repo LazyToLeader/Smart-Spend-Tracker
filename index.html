@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Reset Assistant | Personal Finance Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F9F9F9;
+            color: #333333;
+        }
+        .chart-container {
+            height: 300px;
+            width: 100%;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .custom-shadow {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white custom-shadow py-4 px-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-coins text-[#D6B65C] text-2xl"></i>
+                <span class="text-xl font-bold text-[#333333]">Smart Reset</span>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="#features" class="text-gray-600 hover:text-[#D6B65C] transition">Features</a>
+                <a href="#how-it-works" class="text-gray-600 hover:text-[#D6B65C] transition">How It Works</a>
+                <a href="#pricing" class="text-gray-600 hover:text-[#D6B65C] transition">Pricing</a>
+            </div>
+            <div class="flex space-x-4">
+                <button id="loginBtn" class="px-4 py-2 rounded-lg text-[#333333] hover:bg-[#F9F9F9] transition">Log In</button>
+                <button id="signupBtn" class="px-4 py-2 bg-[#DDE8D4] hover:bg-[#c7d8bb] text-[#333333] rounded-lg transition">Sign Up</button>
+            </div>
+            <button id="mobileMenuBtn" class="md:hidden text-gray-600">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden mt-4 space-y-2 pb-4">
+            <a href="#features" class="block px-4 py-2 text-gray-600 hover:bg-[#F9F9F9] rounded">Features</a>
+            <a href="#how-it-works" class="block px-4 py-2 text-gray-600 hover:bg-[#F9F9F9] rounded">How It Works</a>
+            <a href="#pricing" class="block px-4 py-2 text-gray-600 hover:bg-[#F9F9F9] rounded">Pricing</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="py-16 px-6">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h1 class="text-4xl md:text-5xl font-bold mb-6 text-[#333333]">Take control of your money with <span class="text-[#D6B65C]">Smart Reset</span></h1>
+                <p class="text-lg text-gray-600 mb-8">Simple, AI-powered financial insights to help you understand your spending and save more each month.</p>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <button id="ctaSignupBtn" class="px-6 py-3 bg-[#D6B65C] hover:bg-[#c4a44d] text-white rounded-lg font-medium transition">Start Your Free Trial</button>
+                    <button class="px-6 py-3 border border-[#D6B65C] text-[#D6B65C] hover:bg-[#F9F9F9] rounded-lg font-medium transition">See How It Works</button>
+                </div>
+            </div>
+            <div class="relative">
+                <div class="bg-white rounded-xl p-6 custom-shadow">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-lg">Monthly Summary</h3>
+                        <span class="text-sm text-gray-500">June 2023</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-[#F9F9F9] p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Income</p>
+                            <p class="text-xl font-bold">$4,200</p>
+                        </div>
+                        <div class="bg-[#F9F9F9] p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Expenses</p>
+                            <p class="text-xl font-bold">$3,150</p>
+                        </div>
+                        <div class="bg-[#F9F9F9] p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Savings</p>
+                            <p class="text-xl font-bold">$1,050</p>
+                        </div>
+                        <div class="bg-[#F9F9F9] p-4 rounded-lg">
+                            <p class="text-sm text-gray-500">Savings %</p>
+                            <p class="text-xl font-bold">25%</p>
+                        </div>
+                    </div>
+                    <div class="chart-container mb-6">
+                        <canvas id="demoChart"></canvas>
+                    </div>
+                    <button class="w-full py-3 bg-[#DDE8D4] hover:bg-[#c7d8bb] text-[#333333] rounded-lg font-medium transition">View Full Report</button>
+                </div>
+                <div class="absolute -bottom-4 -right-4 bg-[#DDE8D4] rounded-lg p-4 w-3/4 custom-shadow">
+                    <div class="flex items-start space-x-3">
+                        <div class="bg-white p-2 rounded-full">
+                            <i class="fas fa-robot text-[#D6B65C]"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium">Smart Tip:</p>
+                            <p class="text-xs">You spent 30% on dining out. Try cooking at home 2 more nights this month to save $150.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 px-6 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">Powerful Features</h2>
+            <p class="text-gray-600 text-center max-w-2xl mx-auto mb-12">Everything you need to understand and improve your financial health</p>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-[#F9F9F9] rounded-xl p-6 custom-shadow hover:transform hover:-translate-y-2 transition">
+                    <div class="bg-[#DDE8D4] w-12 h-12 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-chart-pie text-[#D6B65C] text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">Expense Tracking</h3>
+                    <p class="text-gray-600">Categorize your spending and see exactly where your money goes each month with beautiful visualizations.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="bg-[#F9F9F9] rounded-xl p-6 custom-shadow hover:transform hover:-translate-y-2 transition">
+                    <div class="bg-[#DDE8D4] w-12 h-12 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-lightbulb text-[#D6B65C] text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">AI-Powered Insights</h3>
+                    <p class="text-gray-600">Get personalized money tips based on your spending patterns to help you save more and spend smarter.</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="bg-[#F9F9F9] rounded-xl p-6 custom-shadow hover:transform hover:-translate-y-2 transition">
+                    <div class="bg-[#DDE8D4] w-12 h-12 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-calendar-alt text-[#D6B65C] text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">Monthly Resets</h3>
+                    <p class="text-gray-600">Start fresh each month with a clean slate while maintaining access to your historical financial data.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-16 px-6 bg-[#F9F9F9]">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">How It Works</h2>
+            <p class="text-gray-600 text-center max-w-2xl mx-auto mb-12">Simple steps to financial clarity</p>
+            
+            <div class="grid md:grid-cols-4 gap-8">
+                <!-- Step 1 -->
+                <div class="text-center">
+                    <div class="bg-[#DDE8D4] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl font-bold text-[#D6B65C]">1</span>
+                    </div>
+                    <h3 class="font-bold mb-2">Sign Up</h3>
+                    <p class="text-gray-600 text-sm">Create your free account in less than a minute.</p>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="text-center">
+                    <div class="bg-[#DDE8D4] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl font-bold text-[#D6B65C]">2</span>
+                    </div>
+                    <h3 class="font-bold mb-2">Add Your Numbers</h3>
+                    <p class="text-gray-600 text-sm">Input your income and expenses by category.</p>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="text-center">
+                    <div class="bg-[#DDE8D4] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl font-bold text-[#D6B65C]">3</span>
+                    </div>
+                    <h3 class="font-bold mb-2">Get Insights</h3>
+                    <p class="text-gray-600 text-sm">Receive personalized financial advice instantly.</p>
+                </div>
+                
+                <!-- Step 4 -->
+                <div class="text-center">
+                    <div class="bg-[#DDE8D4] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl font-bold text-[#D6B65C]">4</span>
+                    </div>
+                    <h3 class="font-bold mb-2">Reset Monthly</h3>
+                    <p class="text-gray-600 text-sm">Track progress and start fresh each month.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Preview Section -->
+    <section class="py-16 px-6 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold mb-6">Your Personal Financial Dashboard</h2>
+                    <p class="text-gray-600 mb-6">See all your financial data in one beautiful, easy-to-understand interface. Track your progress month over month and make better financial decisions.</p>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>Visual expense breakdown by category</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>Income vs. expense comparisons</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>Savings rate calculator</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>Historical data tracking</span>
+                        </li>
+                    </ul>
+                    <button class="px-6 py-3 bg-[#D6B65C] hover:bg-[#c4a44d] text-white rounded-lg font-medium transition">Try It Free for 30 Days</button>
+                </div>
+                <div class="relative">
+                    <div class="bg-[#F9F9F9] rounded-xl p-6 custom-shadow">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-lg">Financial Dashboard</h3>
+                            <div class="flex space-x-2">
+                                <button class="p-2 text-gray-500 hover:text-[#D6B65C]"><i class="fas fa-download"></i></button>
+                                <button class="p-2 text-gray-500 hover:text-[#D6B65C]"><i class="fas fa-ellipsis-v"></i></button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mb-6">
+                            <div class="bg-white p-3 rounded-lg text-center">
+                                <p class="text-xs text-gray-500">Current Month</p>
+                                <p class="font-bold">June</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg text-center">
+                                <p class="text-xs text-gray-500">Savings Goal</p>
+                                <p class="font-bold">20%</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg text-center">
+                                <p class="text-xs text-gray-500">Achieved</p>
+                                <p class="font-bold text-[#D6B65C]">25%</p>
+                            </div>
+                        </div>
+                        <div class="chart-container mb-6">
+                            <canvas id="dashboardChart"></canvas>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-3 h-3 bg-[#D6B65C] rounded-full"></div>
+                                <span class="text-xs">Savings</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-3 h-3 bg-[#DDE8D4] rounded-full"></div>
+                                <span class="text-xs">Expenses</span>
+                            </div>
+                            <button class="text-xs text-[#D6B65C] hover:underline">View Details</button>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-4 -left-4 bg-white rounded-lg p-4 w-3/4 custom-shadow">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-[#DDE8D4] p-2 rounded-full">
+                                <i class="fas fa-comment-alt text-[#D6B65C]"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium">Monthly Reflection:</p>
+                                <p class="text-xs">"I felt good about money this month because I stuck to my budget and even saved extra!"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-16 px-6 bg-[#F9F9F9]">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">Simple, Transparent Pricing</h2>
+            <p class="text-gray-600 text-center max-w-2xl mx-auto mb-12">Choose the plan that works best for you</p>
+            
+            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Free Plan -->
+                <div class="bg-white rounded-xl p-8 custom-shadow hover:transform hover:-translate-y-2 transition">
+                    <h3 class="font-bold text-xl mb-2">Free</h3>
+                    <p class="text-gray-600 mb-6">Great for trying out Smart Reset</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold">$0</span>
+                        <span class="text-gray-500">/month</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>Track 1 month of finances</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>Basic expense categories</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>3 AI insights per month</span>
+                        </li>
+                    </ul>
+                    <button class="w-full py-3 border border-[#D6B65C] text-[#D6B65C] hover:bg-[#F9F9F9] rounded-lg font-medium transition">Get Started</button>
+                </div>
+                
+                <!-- Premium Plan -->
+                <div class="bg-white rounded-xl p-8 custom-shadow border-2 border-[#D6B65C] relative hover:transform hover:-translate-y-2 transition">
+                    <div class="absolute top-0 right-0 bg-[#D6B65C] text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">MOST POPULAR</div>
+                    <h3 class="font-bold text-xl mb-2">Premium</h3>
+                    <p class="text-gray-600 mb-6">For serious financial tracking</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold">$9</span>
+                        <span class="text-gray-500">/month</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>Unlimited financial history</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>Custom expense categories</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>Unlimited AI insights</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>Export reports (PDF, CSV)</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>Email reminders</span>
+                        </li>
+                    </ul>
+                    <button class="w-full py-3 bg-[#D6B65C] hover:bg-[#c4a44d] text-white rounded-lg font-medium transition">Start Free Trial</button>
+                </div>
+                
+                <!-- Family Plan -->
+                <div class="bg-white rounded-xl p-8 custom-shadow hover:transform hover:-translate-y-2 transition">
+                    <h3 class="font-bold text-xl mb-2">Family</h3>
+                    <p class="text-gray-600 mb-6">For households managing shared finances</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold">$15</span>
+                        <span class="text-gray-500">/month</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>All Premium features</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>Up to 5 family members</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>Shared financial dashboard</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-check text-[#D6B65C] mt-1"></i>
+                            <span>Individual spending insights</span>
+                        </li>
+                    </ul>
+                    <button class="w-full py-3 border border-[#D6B65C] text-[#D6B65C] hover:bg-[#F9F9F9] rounded-lg font-medium transition">Start Free Trial</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-16 px-6 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">What Our Users Say</h2>
+            <p class="text-gray-600 text-center max-w-2xl mx-auto mb-12">Join thousands of happy users taking control of their finances</p>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-[#F9F9F9] rounded-xl p-6 custom-shadow">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-[#DDE8D4] flex items-center justify-center text-[#D6B65C] font-bold mr-4">JD</div>
+                        <div>
+                            <h4 class="font-bold">Jamie D.</h4>
+                            <div class="flex text-[#D6B65C]">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"Smart Reset helped me see where I was wasting money. The AI tips are surprisingly helpful - I've saved $200/month just by following its simple suggestions!"</p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-[#F9F9F9] rounded-xl p-6 custom-shadow">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-[#DDE8D4] flex items-center justify-center text-[#D6B65C] font-bold mr-4">MS</div>
+                        <div>
+                            <h4 class="font-bold">Maria S.</h4>
+                            <div class="flex text-[#D6B65C]">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"As someone who hates budgeting, this app makes it painless. The monthly reset feature keeps me motivated to do better each month without feeling guilty."</p>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-[#F9F9F9] rounded-xl p-6 custom-shadow">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-[#DDE8D4] flex items-center justify-center text-[#D6B65C] font-bold mr-4">TK</div>
+                        <div>
+                            <h4 class="font-bold">Tom K.</h4>
+                            <div class="flex text-[#D6B65C]">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"The family plan has transformed how we manage household finances. My wife and I can both input expenses and see our progress toward shared goals."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 px-6 bg-[#DDE8D4]">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-6">Ready to take control of your finances?</h2>
+            <p class="text-gray-700 mb-8">Join Smart Reset today and start your journey to financial clarity. No credit card required for the free trial.</p>
+            <button class="px-8 py-4 bg-[#D6B65C] hover:bg-[#c4a44d] text-white rounded-lg font-bold text-lg transition">Start Your Free 30-Day Trial</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 bg-[#333333] text-white">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-4 gap-8">
+            <div>
+                <div class="flex items-center space-x-2 mb-4">
+                    <i class="fas fa-coins text-[#D6B65C] text-2xl"></i>
+                    <span class="text-xl font-bold">Smart Reset</span>
+                </div>
+                <p class="text-gray-400 text-sm">Simple, AI-powered financial insights to help you understand your spending and save more each month.</p>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4">Product</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-white transition">Features</a></li>
+                    <li><a href="#" class="hover:text-white transition">Pricing</a></li>
+                    <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+                    <li><a href="#" class="hover:text-white transition">Testimonials</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4">Company</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-white transition">About Us</a></li>
+                    <li><a href="#" class="hover:text-white transition">Careers</a></li>
+                    <li><a href="#" class="hover:text-white transition">Blog</a></li>
+                    <li><a href="#" class="hover:text-white transition">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4">Legal</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-white transition">Terms of Service</a></li>
+                    <li><a href="#" class="hover:text-white transition">Security</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto mt-12 pt-6 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-gray-400 text-sm mb-4 md:mb-0">© 2023 Smart Reset Assistant. All rights reserved.</p>
+            <div class="flex space-x-6">
+                <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auth Modals -->
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-8 w-full max-w-md relative fade-in">
+            <button id="closeLoginModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="text-2xl font-bold mb-6">Log In</h2>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label for="loginEmail" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="loginEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D6B65C] focus:border-[#D6B65C] outline-none transition" required>
+                </div>
+                <div class="mb-6">
+                    <label for="loginPassword" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="loginPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D6B65C] focus:border-[#D6B65C] outline-none transition" required>
+                </div>
+                <button type="submit" class="w-full py-3 bg-[#D6B65C] hover:bg-[#c4a44d] text-white rounded-lg font-medium transition mb-4">Log In</button>
+                <div class="text-center">
+                    <a href="#" class="text-sm text-[#D6B65C] hover:underline">Forgot password?</a>
+                </div>
+            </form>
+            <div class="mt-6 pt-6 border-t border-gray-200 text-center">
+                <p class="text-sm text-gray-600">Don't have an account? <a href="#" id="switchToSignup" class="text-[#D6B65C] hover:underline font-medium">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-8 w-full max-w-md relative fade-in">
+            <button id="closeSignupModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="text-2xl font-bold mb-6">Create Your Account</h2>
+            <form id="signupForm">
+                <div class="mb-4">
+                    <label for="signupName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="signupName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D6B65C] focus:border-[#D6B65C] outline-none transition" required>
+                </div>
+                <div class="mb-4">
+                    <label for="signupEmail" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="signupEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D6B65C] focus:border-[#D6B65C] outline-none transition" required>
+                </div>
+                <div class="mb-4">
+                    <label for="signupPassword" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="signupPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D6B65C] focus:border-[#D6B65C] outline-none transition" required>
+                </div>
+                <div class="mb-6">
+                    <label for="signupConfirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                    <input type="password" id="signupConfirmPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D6B65C] focus:border-[#D6B65C] outline-none transition" required>
+                </div>
+                <div class="flex items-center mb-6">
+                    <input type="checkbox" id="signupTerms" class="w-4 h-4 text-[#D6B65C] border-gray-300 rounded focus:ring-[#D6B65C]" required>
+                    <label for="signupTerms" class="ml-2 block text-sm text-gray-700">
+                        I agree to the <a href="#" class="text-[#D6B65C] hover:underline">Terms of Service</a> and <a href="#" class="text-[#D6B65C] hover:underline">Privacy Policy</a>
+                    </label>
+                </div>
+                <button type="submit" class="w-full py-3 bg-[#D6B65C] hover:bg-[#c4a44d] text-white rounded-lg font-medium transition">Create Account</button>
+            </form>
+            <div class="mt-6 pt-6 border-t border-gray-200 text-center">
+                <p class="text-sm text-gray-600">Already have an account? <a href="#" id="switchToLogin" class="text-[#D6B65C] hover:underline font-medium">Log in</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onboarding Modal -->
+    <div id="onboardingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-8 w-full max-w-2xl relative fade-in">
+            <button id="closeOnboardingModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="text-2xl font-bold mb-6 text-center">Welcome to Smart Reset!</h2>
+            <p class="text-gray-600 text-center mb-8">Let's get you started with your financial journey</p>
+            
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="text-center">
+                    <div class="bg-[#DDE8D4] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-wallet text-[#D6B65C] text-xl"></i>
+                    </div>
+                    <h3 class="font-bold mb-2">1. Add Your Income</h3>
+                    <p class="text-gray-600 text-sm">Start by entering all your income sources for the month.</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-[#DDE8D4] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shopping-cart text-[#D6B65C] text-xl"></i>
+                    </div>
+                    <h3 class="font-bold mb-2">2. Track Expenses</h3>
+                    <p class="text-gray-600 text-sm">Categorize your spending to see where your money goes.</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-[#DDE8D4] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-lightbulb text-[#D6B65C] text-xl"></i>
+                    </div>
+                    <h3 class="font-bold mb-2">3. Get Insights</h3>
+                    <p class="text-gray-600 text-sm">Receive personalized tips to improve your finances.</p>
+                </div>
+            </div>
+            
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <input type="checkbox" id="dontShowAgain" class="w-4 h-4 text-[#D6B65C] border-gray-300 rounded focus:ring-[#D6B65C]">
+                    <label for="dontShowAgain" class="ml-2 block text-sm text-gray-700">Don't show this again</label>
+                </div>
+                <button id="startUsingApp" class="px-6 py-2 bg-[#D6B65C] hover:bg-[#c4a44d] text-white rounded-lg font-medium transition">Let's Go!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Auth Modals
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const ctaSignupBtn = document.getElementById('ctaSignupBtn');
+        const loginModal = document.getElementById('loginModal');
+        const signupModal = document.getElementById('signupModal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const closeSignupModal = document.getElementById('closeSignupModal');
+        const switchToSignup = document.getElementById('switchToSignup');
+        const switchToLogin = document.getElementById('switchToLogin');
+        
+        // Show login modal
+        loginBtn.addEventListener('click', () => {
+            loginModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        // Show signup modal
+        signupBtn.addEventListener('click', () => {
+            signupModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        // Show signup modal from CTA
+        ctaSignupBtn.addEventListener('click', () => {
+            signupModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        // Close modals
+        closeLoginModal.addEventListener('click', () => {
+            loginModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        });
+        
+        closeSignupModal.addEventListener('click', () => {
+            signupModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        });
+        
+        // Switch between login and signup
+        switchToSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.classList.add('hidden');
+            signupModal.classList.remove('hidden');
+        });
+        
+        switchToLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            signupModal.classList.add('hidden');
+            loginModal.classList.remove('hidden');
+        });
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+            if (e.target === signupModal) {
+                signupModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Onboarding Modal
+        const onboardingModal = document.getElementById('onboardingModal');
+        const closeOnboardingModal = document.getElementById('closeOnboardingModal');
+        const startUsingApp = document.getElementById('startUsingApp');
+        
+        // Show onboarding modal after signup
+        document.getElementById('signupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            signupModal.classList.add('hidden');
+            onboardingModal.classList.remove('hidden');
+        });
+        
+        // Close onboarding modal
+        closeOnboardingModal.addEventListener('click', () => {
+            onboardingModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        });
+        
+        startUsingApp.addEventListener('click', () => {
+            onboardingModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            
+            // If "Don't show again" is checked, set a cookie
+            if (document.getElementById('dontShowAgain').checked) {
+                localStorage.setItem('onboardingShown', 'true');
+            }
+        });
+        
+        // Check if onboarding should be shown
+        if (!localStorage.getItem('onboardingShown')) {
+            // onboardingModal.classList.remove('hidden');
+            // document.body.style.overflow = 'hidden';
+        }
+
+        // Demo Charts
+        // Demo Pie Chart
+        const demoCtx = document.getElementById('demoChart').getContext('2d');
+        const demoChart = new Chart(demoCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Housing', 'Food', 'Transport', 'Entertainment', 'Subscriptions', 'Other'],
+                datasets: [{
+                    data: [1200, 600, 400, 300, 150, 500],
+                    backgroundColor: [
+                        '#DDE8D4',
+                        '#D6B65C',
+                        '#B8D8D8',
+                        '#F4B9B2',
+                        '#A5A5A5',
+                        '#E8D4DE'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 20
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+
+        // Dashboard Bar Chart
+        const dashboardCtx = document.getElementById('dashboardChart').getContext('2d');
+        const dashboardChart = new Chart(dashboardCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [
+                    {
+                        label: 'Income',
+                        data: [3800, 4200, 4000, 4300, 4100, 4200],
+                        backgroundColor: '#D6B65C',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Expenses',
+                        data: [3200, 3500, 3400, 3600, 3300, 3150],
+                        backgroundColor: '#DDE8D4',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 20
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Form Submissions
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Here you would typically handle login logic
+            alert('Login functionality would be implemented here!');
+            loginModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        });
+    </script>
+<p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">Made with <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo" style="width: 16px; height: 16px; vertical-align: middle;display:inline-block;margin-right:3px;filter:brightness(0) invert(1);"><a href="https://enzostvs-deepsite.hf.space" style="color: #fff;text-decoration: underline;" target="_blank" >DeepSite</a> - 🧬 <a href="https://enzostvs-deepsite.hf.space?remix=Lazytoleader/smart-spend-tracker" style="color: #fff;text-decoration: underline;" target="_blank" >Remix</a></p></body>
+</html>
